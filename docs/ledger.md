@@ -147,6 +147,11 @@ printer itself.
 Passwords are handled in the browser (WebCrypto plus Ledger's own AES and SHA code), so the page must
 be served over https or from localhost. A workbook opened with its password keeps it when saved.
 
+Exporting a workbook as CSV, tab-delimited text or a web page keeps the workbook's unsaved changes
+and recovery draft: those copies do not preserve everything in the workbook. Closing still asks to
+save it, and choosing an export there leaves it open until it is saved as a workbook or the changes
+are explicitly discarded. The desktop app can still save an opened CSV or text file in place.
+
 ## What a save keeps, converts and drops
 
 The full LibreOffice pass on the versioned `984eaf3` artifacts renders **930/935 unedited saves**;

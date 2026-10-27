@@ -34,6 +34,7 @@ const SECONDS = { 'tests/ui/smoke.test.mjs': 20, 'tests/ui/quire.test.mjs': 175,
 const RULES = [
   [/^public\/(quire|ledger|lectern|common)\/|^public\/[^/]+\.(html|js|css)$/, ['tests/ui/smoke.test.mjs', 'tests/licenses.test.mjs', 'tests/from-issues/*/*.test.mjs', 'tests/i18n.test.mjs']],   // and the reported issues' tests, the English catalog
   [/^public\/ledger\/|^tools\/ledger\//, ['tests/ledger/*.test.js', 'tests/ui/ledger.test.mjs']],
+  [/^public\/ledger\/js\/(app|dialogs)\.js$/, ['tests/ledger/export-state.test.mjs']],
   [/^public\/quire\//, ['tests/quire/*.test.js', 'tests/ui/quire.test.mjs']],
   [/^public\/quire\/js\/(render|portions|layout|drawing)\.js$|^tests\/lib\/lines\.mjs$/, ['tests/quire/lines.test.mjs']],   // line heights against Word and LibreOffice
   [/^public\/lectern\//, ['tests/ooxml/lectern-review.test.mjs', 'tests/ui/lectern.test.mjs']],

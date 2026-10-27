@@ -112,7 +112,7 @@
     if (!b || !b.dirty) return true;
     const r = await ui.msg(L.t("Do you want to save the changes you made to '{0}'?", b.name), { icon: 'warn', buttons: ['&Yes', '&No', 'Cancel'] });
     if (r === 2 || r == null) return false;
-    if (r === 0) { const ok = await A.save(); if (!ok) return false; }
+    if (r === 0) { const ok = await A.save(); if (!ok || b.dirty) return false; }
     if (r === 1 && window.VO) VO.discard(b);   // its unsaved version goes too
     return true;
   }
@@ -309,8 +309,8 @@
         if (own && type !== 'csv' && type !== 'txt' && type !== 'html') { b.name = name; b.type = type; b.untitled = false; b.dirty = changed; w.fileName = name; }
         /* the desktop app's Save of the text or web page file it opened: saved, but for the sheets a text file can't hold */
         else if (how === 'save') b.dirty = changed || (type !== 'html' && w.sheets.length > 1);
-        else if (b.untitled && !L.file.native()) b.dirty = false;
-        if (window.VO && type !== 'html') VO.saved(name, blob, b);
+        /* An export is a copy, not the workbook's saved state: keep its dirty flag and recovery draft. */
+        if (window.VO && own && type !== 'html' && (how === 'save' || (type !== 'csv' && type !== 'txt'))) VO.saved(name, blob, b);
         updateTitle();
         A.status('');
         return true;
