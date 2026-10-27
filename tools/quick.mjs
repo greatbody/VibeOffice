@@ -45,6 +45,7 @@ const RULES = [
   [/^public\/common\/smartart/, ['tests/smartart.test.mjs']],
   [/^public\/common\/zip\.js$|^public\/sw\.js$/, ['tests/sw.test.mjs']],
   [/^public\/common\/crypto\.js$/, ['tests/crypto.test.mjs']],
+  [/^public\/common\/suite\.js$/, ['tests/recent.test.mjs']],
   [/^public\/common\/spell\.js$/, ['tests/autocorrect.test.mjs']],
   [/^public\/common\/geometry\.js$|^public\/ledger\/js\/render\.js$|^tools\/patterns\//, ['tests/patterns.test.mjs']],
   [/^public\/common\/(xml|opc|opc-order)\.js$/, ['tests/ooxml/opc.test.mjs', 'tests/ooxml/check.test.mjs']],

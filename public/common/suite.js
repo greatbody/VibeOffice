@@ -305,6 +305,16 @@
       t.onerror = t.onabort = () => reject(t.error);
     });
   }
+  /** Read and change one entry in the same write transaction, including across tabs. Returning null deletes
+   *  it; undefined leaves it alone. Never await inside update: its write belongs to the read's transaction. */
+  const updateRecent = (key, update) => tx('recent', 'readwrite', (s) => {
+    const r = s.get(key);
+    r.onsuccess = () => {
+      const e = update(r.result);
+      if (e) s.put(e);
+      else if (e === null) s.delete(key);
+    };
+  });
   const chan = !native && 'BroadcastChannel' in window ? new BroadcastChannel('vibeoffice') : null;   // the desktop app: vo-recent
   const listeners = new Set();
   const notify = () => { VO.recent.refresh(); for (const fn of listeners) if (!fn.cacheOnly) fn(); };   // cache users redraw after the refresh
@@ -356,8 +366,13 @@
   const MAX_BYTES = 50 * 1024 * 1024;   // bigger files are not kept (open them from disk again)
   const prune = async () => {
     /* entries with unsaved changes are never dropped */
-    const all = (await VO.recent.list()).filter((e) => !e.draft);
-    if (all.length > MAX_RECENT) await tx('recent', 'readwrite', (s) => { for (const e of all.slice(MAX_RECENT)) s.delete(e.key); });
+    await tx('recent', 'readwrite', (s) => {
+      const r = s.getAll();
+      r.onsuccess = () => {
+        const all = r.result.filter((e) => !e.draft).sort((a, b) => b.time - a.time);
+        for (const e of all.slice(MAX_RECENT)) s.delete(e.key);
+      };
+    });
   };
   /* Safari clears a site's data after about 7 days without a visit, unsaved versions included; once a
      document has unsaved changes, ask the browser to keep the data (Safari and Chrome decide without
@@ -395,36 +410,40 @@
     async put(app, name, blob, keepDraft) {
       if (!app || !blob || blob.size > MAX_BYTES) return null;
       const key = app + ':' + name;
-      const old = await VO.recent.get(key);
-      await tx('recent', 'readwrite', (s) => s.put({ key, app, name, size: blob.size, time: Date.now(), file: blob, thumb: old ? old.thumb : null, draft: keepDraft && old ? old.draft || null : null }));
+      await updateRecent(key, (old) => ({ key, app, name, size: blob.size, time: Date.now(), file: blob, thumb: old ? old.thumb : null, draft: keepDraft && old ? old.draft || null : null }));
       await prune();
       changed();
       return key;
     },
     /** store the unsaved version of a document */
     async setDraft(key, app, name, draftName, blob, lossState) {
-      const e = (await VO.recent.get(key)) || { key, app, name, size: 0, file: null, thumb: null };
-      if (!e.file) e.name = name;
-      e.draft = { file: blob, name: draftName || name, time: Date.now(), lossState };
-      e.time = e.draft.time;
-      await tx('recent', 'readwrite', (s) => s.put(e));
+      await updateRecent(key, (old) => {
+        const e = old || { key, app, name, size: 0, file: null, thumb: null };
+        if (!e.file) e.name = name;
+        e.draft = { file: blob, name: draftName || name, time: Date.now(), lossState };
+        e.time = e.draft.time;
+        return e;
+      });
       changed();
       keepData();
     },
     /** throw the unsaved version away; a document that was never saved leaves the list */
     async discardDraft(key) {
       if (native) return call('host_discard_draft', { key });
-      const e = await VO.recent.get(key);
-      if (!e) return;
-      if (!e.file) await tx('recent', 'readwrite', (s) => s.delete(key));
-      else { e.draft = null; await tx('recent', 'readwrite', (s) => s.put(e)); }
+      await updateRecent(key, (e) => {
+        if (!e) return;
+        if (!e.file) return null;
+        e.draft = null;
+        return e;
+      });
       changed();
     },
     async setThumb(key, thumb) {
-      const e = await VO.recent.get(key);
-      if (!e) return;
-      e.thumb = thumb;
-      await tx('recent', 'readwrite', (s) => s.put(e));
+      await updateRecent(key, (e) => {
+        if (!e) return;
+        e.thumb = thumb;
+        return e;
+      });
       changed();
     },
     async remove(key) { if (native) return call('host_recent_remove', { key }); await tx('recent', 'readwrite', (s) => s.delete(key)); changed(); },
