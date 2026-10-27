@@ -140,7 +140,7 @@ printer itself.
 | Strict Open XML `.xlsx` | yes | standard Transitional OOXML (recorded, not shown) |
 | CSV `.csv`, text `.txt` / `.tsv` / `.prn` | yes: UTF-8, UTF-16 and Windows-1252 detected; the Text Import Wizard for delimited and fixed-width text | yes: CSV (UTF-8) and tab-delimited text, what each cell shows, as Excel does |
 | XML Spreadsheet 2003 `.xml` | yes | yes |
-| Web Page `.htm` / `.html` | yes: each table on the page becomes a sheet | yes: one self-contained page per workbook, with its own security policy (no scripts) |
+| Web Page `.htm` / `.html` | yes: each table on the page becomes a sheet | yes: one self-contained page per workbook, covering each visible sheet's full used range (including columns after IV and rows after 65,536), with its own security policy (no scripts) |
 | PDF | — | yes |
 | Excel 97–2003 `.xls` | no — Ledger explains how to convert it | no |
 

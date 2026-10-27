@@ -440,7 +440,7 @@
   CSV.htmlSheet = function (wb, sh) {
     const LY = L.layout;
     const esc = L.esc;
-    const lastR = Math.min(sh.maxR, 65535), lastC = Math.min(sh.maxC, 255);
+    const lastR = sh.maxR, lastC = sh.maxC;
     const covered = new Set();
     let html = `<table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;table-layout:fixed">`;
     html += '<colgroup>';
