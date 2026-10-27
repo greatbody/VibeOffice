@@ -84,3 +84,4 @@ t('ROMAN(1999)', 'MCMXCIX'); t('ARABIC("MCMXCIX")', 1999); t('BASE(255,16,4)', '
 t('1/0', '#DIV/0!'); t('SQRT(-1)', '#NUM!'); t('"a"+1', '#VALUE!'); t('NA()', '#N/A'); t('UNKNOWNFN(1)', '#NAME?'); t('A1:A3 B1:B3', '#NULL!');
 t('2^-1', 0.5); t('-2^2', 4); t('10%', 0.1); t('5&"%"', '5%'); t('1E+308*10', '#NUM!'); t('(1+2)*3', 9); t('3>2>1', true);
 console.log(n - fail + '/' + n);
+if (fail) process.exitCode = 1;

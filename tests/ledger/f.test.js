@@ -15,3 +15,4 @@ console.log(F.toText(F.adjust(F.parse('SUM(A1:A10)+B5+A3'), { sheet: 'Sheet1', a
 console.log(F.toText(F.parse('_xlfn.LET(_xlpm.x,5,_xlpm.x*2)')), F.toText(F.parse('_xlfn.LET(_xlpm.x,5,_xlpm.x*2)'), { store: true }));
 console.log(JSON.stringify(F.parse('-2^2')), JSON.stringify(F.parse('2^3^2')));
 console.log(n - fail + '/' + n);
+if (fail) process.exitCode = 1;
